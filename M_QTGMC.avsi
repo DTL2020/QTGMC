@@ -5,17 +5,9 @@ LoadPlugin("masktools2.dll")
 LoadPlugin("plugins_JPSDR.dll")
 LoadPlugin("RgTools.dll")
 LoadPlugin("TDeint.dll")
-LoadPlugin("Average.dll")
 
 Import("Zs_RF_Shared.avsi")
 Import("QTGMC2.avsi")
-
-Function GetSharpest(clip c1, clip c2)
-{
-  avg=Average(c1.GaussResize(c1.width, c1.height, src_left=0.001, src_top=0.001, p=2), 0.5, c2.GaussResize(c2.width, c2.height, src_left=0.001, src_top=0.001, p=2), 0.5)
-
-  return MostDiffVal(avg, c1, c2)
-}
 
 
 Function GetSharpest2(clip c1, clip c2)
@@ -24,7 +16,6 @@ Function GetSharpest2(clip c1, clip c2)
 
   return MostDiffVal(avg, c1, c2)
 }
-
 
 Function M_QTGMC_high(clip input, int "TR2", int "ThSAD2")
 {
