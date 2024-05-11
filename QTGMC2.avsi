@@ -1333,6 +1333,24 @@ function QTGMC_ApplySourceMatch( clip Deinterlace, int InputType, val Source, va
 	# Apply difference calculated in source-match refinement
 	return (SourceMatch < 2) ? match1 : match1Shp.mt_adddiff( match3, U=3,V=3 )
 }
+
+# Set global variable called "Prefix_Name" to "Value". Throws exception if global already exists unless Replace=true, in which case the global is overwritten
+function QTGMC_SetUserGlobal( string Prefix, string Name, val Value, bool "Replace" )
+{
+	Replace = default( Replace, false )
+	globalName = Prefix + "_" + Name
+
+	# Tricky logic to check global: enter catch block if Replace=true *or* globalName doesn't exist (i.e. need to set the global), the exception is not rethrown
+	# Not entering catch block means that Replace=false and global exists - so it throws an exception back to AviSynth
+	try { Assert( !Replace && defined(Eval(globalName)) ) }
+	catch (e)
+	{
+		Eval( "global " + globalName + " = Value" )
+		Replace = true
+	}
+	Assert( Replace, """Multiple calls to QTGMC, set PrevGlobals="Replace" or read documentation on 'Multiple QTGMC Calls'""" )
+}
+
 # Return value of global variable called "Prefix_Name". Returns NOP() if it doesn't exist or Reuse is false
 function QTGMC_GetUserGlobal( string Prefix, string Name, bool "Reuse" )
 {
@@ -1343,3 +1361,4 @@ function QTGMC_GetUserGlobal( string Prefix, string Name, bool "Reuse" )
 	catch (e) { ret = NOP() }
 	return ret
 }
+
