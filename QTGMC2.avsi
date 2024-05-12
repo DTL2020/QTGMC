@@ -209,7 +209,7 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
                     val "BT", val "DetailRestore", val "MotionBlur", val "MBlurLimit", val "NoiseBypass", float "Str", float "Amp", bool "TV_range", \
 	            int "useEdiExt", int "DftDither", bool "lsbd", bool "lsb", bool "n16", bool "keep_tv_range", String "device_type", int "device_id", \
                     bool "n16d", bool "FastMA", bool "ESearchP", bool "Refinemotion", int "mvt_SearchOption", int "mvt_AreaMode", int "mvt_AMstep", int "mvt_AMoffset", \
-		    int "mvt_AMflags", int "mvt_AMavg", int "mvt_mdp", int "mvt_mpm", bool "bSupCurrent")
+		    int "mvt_AMflags", int "mvt_AMavg", int "mvt_AMpel", int "mvt_mdp", int "mvt_mpm", bool "bSupCurrent")
 {
 	# EdiMode="RepcYadif"/"cYadif" require the Yadif plugin, which doesn't autoload. Typically the calling script would load it.
 
@@ -235,6 +235,7 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	#DX12_ME and post-2.7.45
 	mvt_SearchOption = default (mvt_searchOption, 0)
 	mvt_AreaMode = default(mvt_AreaMode, 0)
+	mvt_AMpel = default(mvt_AreaMode, 0)
 	mvt_AMstep = default(mvt_AMstep, 0)
 	mvt_AMoffset = default(mvt_AMoffset, 0)
 	mvt_AMflags = default(mvt_AMflags, 1)
@@ -605,10 +606,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec6 = bVec6c ? bVec6 : \
 	        (maxTR > 5)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=6, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent, \
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption=mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption=mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=6, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent, \
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec6 = bVec6c || !RefineMotion || !(maxTR > 5) ? bVec6 : defined(bomt) ? srchSuper.MRecalculate(bVec6, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -620,10 +621,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec5 = bVec5c ? bVec5 : \
 	        (maxTR > 4)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=5, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent, \
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption , AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption , AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=5, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec5 = bVec5c || !RefineMotion || !(maxTR > 4) ? bVec5 : defined(bomt) ? srchSuper.MRecalculate(bVec5, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -635,10 +636,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec4 = bVec4c ? bVec4 : \
 	        (maxTR > 3)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=4, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent, \
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=4, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent, \
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec4 = bVec4c || !RefineMotion || !(maxTR > 3) ? bVec4 : defined(bomt) ? srchSuper.MRecalculate(bVec4, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -650,10 +651,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec3 = bVec3c ? bVec3 : \
 	        (maxTR > 2)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=3, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=3, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec3 = bVec3c || !RefineMotion || !(maxTR > 2) ? bVec3 : defined(bomt) ? srchSuper.MRecalculate(bVec3, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -665,10 +666,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec2 = bVec2c ? bVec2 : \
 	        (maxTR > 1)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=2, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=2, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec2 = bVec2c || !RefineMotion || !(maxTR > 1) ? bVec2 : defined(bomt) ? srchSuper.MRecalculate(bVec2, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -680,10 +681,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	bVec1 = bVec1c ? bVec1 : \
 	        (maxTR > 0)   ? defined(bomt) ? srchSuper.MAnalyse( isb=true,  delta=1, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=true,  delta=1, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	bVec1 = bVec1c || !RefineMotion || !(maxTR > 0) ? bVec1 : defined(bomt) ? srchSuper.MRecalculate(bVec1, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -695,10 +696,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec1 = fVec1c ? fVec1 : \
 	        (maxTR > 0)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=1, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=1, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	fVec1 = fVec1c || !RefineMotion || !(maxTR > 0) ? fVec1 : defined(bomt) ? srchSuper.MRecalculate(fVec1, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -710,10 +711,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec2 = fVec2c ? fVec2 : \
 	        (maxTR > 1)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=2, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=2, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	fVec2 = fVec2c || !RefineMotion || !(maxTR > 1) ? fVec2 : defined(bomt) ? srchSuper.MRecalculate(fVec2, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -725,10 +726,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec3 = fVec3c ? fVec3 : \
 	        (maxTR > 2)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=3, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=3, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	fVec3 = fVec3c || !RefineMotion || !(maxTR > 2) ? fVec3 : defined(bomt) ? srchSuper.MRecalculate(fVec3, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -740,10 +741,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec4 = fVec4c ? fVec4 : \
 	        (maxTR > 3)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=4, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel,  mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=4, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	fVec4 = fVec4c || !RefineMotion || !(maxTR > 3) ? fVec4 : defined(bomt) ? srchSuper.MRecalculate(fVec4, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -755,10 +756,10 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec5 = fVec5c ? fVec5 : \
 	        (maxTR > 4)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=5, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=5, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
 
 	fVec5 = fVec5c || !RefineMotion || !(maxTR > 4) ? fVec5 : defined(bomt) ? srchSuper.MRecalculate(fVec5, overlap=halfoverlap, blksize=halfblksize, thSAD=halfthSAD, DCT=DCT, \
 																										chroma=ChromaMotion, truemotion=TrueMotion, search=Search,                \
@@ -770,7 +771,7 @@ function QTGMC2( clip Input, string "Preset", int "TR0", int "TR1", int "TR2", i
 	fVec6 = fVec6c ? fVec6 : \
 	        (maxTR > 5)   ? defined(bomt) ? srchSuper.MAnalyse( isb=false, delta=6, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
+	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, mt=bomt, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, AMpel=mvt_AMpel, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) \
 										  : srchSuper.MAnalyse( isb=false, delta=6, blksize=BlockSize, overlap=Overlap, search=Search, searchparam=SearchParam, SuperCurrent=srchSuperCurrent,\
 	                                            pelsearch=PelSearch, truemotion=TrueMotion, lambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            global=GlobalMotion, DCT=DCT, chroma=ChromaMotion, optSearchOption = mvt_SearchOption, AreaMode=mvt_AreaMode, AMstep=mvt_AMstep, AMoffset=mvt_AMoffset, AMflags=mvt_AMflags, mdp=mvt_mdp, AMavg=mvt_AMavg, mpm=mvt_mpm) : NOP()
