@@ -54,8 +54,8 @@ Function M_QTGMC_medhigh(clip input, int "TR2", int "ThSAD2")
  c_bs8=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
  c_bs8_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
+ c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  mdv=GetSharpest2(c_bs8, c_bs8_nopp)
  mdv2=GetSharpest2(c_bs16, c_bs16_nopp)
@@ -73,8 +73,8 @@ Function M_QTGMC(clip input, int "TR2", int "ThSAD2")
  c_bs8=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
  c_bs8_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
+ c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  mdv=GetSharpest2(c_bs8, c_bs8_nopp)
  mdv2=GetSharpest2(c_bs16, c_bs16_nopp)
@@ -91,8 +91,8 @@ Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2")
  c_bs8=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
  c_bs8_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
+ c_bs16_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  mdv=GetSharpest2(c_bs8, c_bs8_nopp)
  mdv2=GetSharpest2(c_bs16, c_bs16_nopp)
