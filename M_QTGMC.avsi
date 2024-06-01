@@ -17,7 +17,7 @@ Function GetSharpest2(clip c1, clip c2)
   return MostDiffVal(avg, c1, c2)
 }
 
-Function M_QTGMC_high(clip input, int "TR2", int "ThSAD2")
+Function M_QTGMC_high(clip input, int "TR2", int "ThSAD2", int "ThSCD1")
 {
  
  TR2=Default(TR2, 4)
@@ -66,7 +66,7 @@ Function M_QTGMC_medhigh(clip input, int "TR2", int "ThSAD2", int "ThSCD1")
 }
 
 
-Function M_QTGMC(clip input, int "TR2", int "ThSAD2")
+Function M_QTGMC(clip input, int "TR2", int "ThSAD2", int "ThSCD1")
 {
  
  TR2=Default(TR2, 2)
@@ -85,7 +85,7 @@ Function M_QTGMC(clip input, int "TR2", int "ThSAD2")
  return GetSharpest2(mdv, mdv2)
 }
 
-Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2")
+Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2", int "ThSCD1")
 {
  
  TR2=Default(TR2, 1)
@@ -104,7 +104,7 @@ Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2")
  return GetSharpest2(mdv, mdv2)
 }
 
-Function M_QTGMC_low(clip input, int "TR2", int "ThSAD2")
+Function M_QTGMC_low(clip input, int "TR2", int "ThSAD2", int "ThSCD1")
 {
  
  TR2=Default(TR2, 0)
