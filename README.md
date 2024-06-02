@@ -15,7 +15,7 @@ M_QTGMC_medlow() - medium low preset. Subsample precision of 1/2 (HPEL).
 M_QTGMC_low() - low preset. Subsample precision of 1 (FPEL). No AreaMode.
 
 Available params:
-1. smode (integer) - sample selection mode. 0 - most different value (from low-pass filtered average). Make more sharpness but less 'linear' look. 1 - median. Make softer look but more 'linear'.
+1. smode (integer) - sample selection mode. 0 - most different value (from low-pass filtered average). Make more sharpness but less 'linear' look, also make any noise and other sharp distortions more visible. 1 - median. Make softer look but more 'linear'.
 
 Other params:  TR2, ThSAD2, ThSCD1, SourceMatch, Lossless, Sharpness, MatchPreset, MatchPreset2 - see QTGMC documentation at http://avisynth.nl/index.php/QTGMC . MatchPreset and MatchPreset2 internally default to UltraFast and not follow preset 'slow' as in QTGMC. So it is required to manually set MatchPreset and MatchPreset2 to required value if default UltraFast is not enough.
 
