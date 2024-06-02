@@ -1,6 +1,5 @@
 LoadPlugin("mostdiffval.dll")
 LoadPlugin("mvtools2.dll")
-LoadPlugin("Average.dll")
 LoadPlugin("masktools2.dll")
 LoadPlugin("plugins_JPSDR.dll")
 LoadPlugin("RgTools.dll")
@@ -41,18 +40,17 @@ Function GetSharpest2_8(clip c1, clip c2, clip c3, clip c4, clip c5, clip c6, cl
 }
 
 
-Function GetMedian4(clip c1, clip c2, clip c3, clip c4)
+Function GetMedian4(clip c1, clip c2, clip c3, clip c4, clip ref)
 {
- avg=Average(c1, 0.25, c2, 0.25, c3, 0.25, c4, 0.25)
- int=Interleave(c1, c2, avg, c3, c4)
+ int=Interleave(c1, c2, ref, c3, c4)
  med=vsTTempsmooth(int, pmode=1, maxr=2, ythresh=256, uthresh=256, vthresh=256)
  return SelectEvery(med, 5, 2)
 }
 
-Function GetMedian8(clip c1, clip c2, clip c3, clip c4, clip c5, clip c6, clip c7, clip c8)
+
+Function GetMedian8(clip c1, clip c2, clip c3, clip c4, clip c5, clip c6, clip c7, clip c8, clip ref)
 {
- avg=Average(c1, 0.125, c2, 0.125, c3, 0.125, c4, 0.125, c5, 0.125, c6, 0.125, c7, 0.125, c8, 0.125)
- int=Interleave(c1, c2, c3, c4, avg, c5, c6, c7, c8)
+ int=Interleave(c1, c2, c3, c4, ref, c5, c6, c7, c8)
  med=vsTTempsmooth(int, pmode=1, maxr=4, ythresh=256, uthresh=256, vthresh=256)
  return SelectEvery(med, 9, 4)
 }
@@ -83,8 +81,7 @@ Function M_QTGMC_high(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "So
  c_bs16_notmnopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=false, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMstep=2, mvt_AMflags=1, mvt_AMpel=0, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1,SrchClipPP=0)
 
  return (Smode == 0) ? GetSharpest2_8(c_bs8, c_bs8_nopp, c_bs8_notmnopp, c_bs8_notm, c_bs16, c_bs16_nopp, c_bs16_notmnopp, c_bs16_notm) : \
- GetMedian8(c_bs8, c_bs8_nopp, c_bs8_notmnopp, c_bs8_notm, c_bs16, c_bs16_nopp, c_bs16_notmnopp, c_bs16_notm)  
-
+  GetMedian8(c_bs8, c_bs8_nopp, c_bs8_notmnopp, c_bs8_notm, c_bs16, c_bs16_nopp, c_bs16_notmnopp, c_bs16_notm, input.sh_Bob(0, 0.5))
 }
 
 Function M_QTGMC_medhigh(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "SourceMatch", int "Lossless", float "Sharpness", string "MatchPreset", string "MatchPreset2", int "smode")
@@ -100,17 +97,16 @@ Function M_QTGMC_medhigh(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int 
  MatchPreset2=Default(MatchPreset2, "Ultra Fast")
  SMode=Default(smode, 0) # output selection mode: 0 - mostdiffval, 1 - median
 
- c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=0, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=4, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=2, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  return (Smode == 0) ? GetSharpest2_4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp) : \
- GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp)  
+  GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp, input.sh_Bob(0, 0.5))  
 
 }
-
 
 Function M_QTGMC(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "SourceMatch", int "Lossless", float "Sharpness", string "MatchPreset", string "MatchPreset2", int "smode")
 {
@@ -125,16 +121,17 @@ Function M_QTGMC(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "SourceM
  MatchPreset2=Default(MatchPreset2, "Ultra Fast")
  SMode=Default(smode, 0) # output selection mode: 0 - mostdiffval, 1 - median
 
- c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=4, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
  
- return (Smode == 0) ? GetSharpest2_4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp) : \
- GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp)  
+ return (SMode == 0) ? GetSharpest2_4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp) : \
+  GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp, input.sh_Bob(0, 0.5))  
 
 }
+
 
 Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "SourceMatch", int "Lossless", float "Sharpness", string "MatchPreset", string "MatchPreset2", int "smode")
 {
@@ -149,14 +146,14 @@ Function M_QTGMC_medlow(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "
  MatchPreset2=Default(MatchPreset2, "Ultra Fast")
  SMode=Default(smode, 0) # output selection mode: 0 - mostdiffval, 1 - median
 
- c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs8_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs8_nopp=QTGMC2(input, preset="slow", thSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=2, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=2, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=1, mvt_AMoffset=4, mvt_AMflags=1, mvt_AMavg=6, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  return (Smode == 0) ? GetSharpest2_4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp) : \
- GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp)  
+  GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp, input.sh_Bob(0, 0.5))  
 
 }
 
@@ -173,13 +170,13 @@ Function M_QTGMC_low(clip input, int "TR2", int "ThSAD2", int "ThSCD1", int "Sou
  MatchPreset2=Default(MatchPreset2, "Ultra Fast")
  SMode=Default(smode, 0) # output selection mode: 0 - mostdiffval, 1 - median
 
- c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1)
- c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs8=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs8_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=8, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
- c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1)
- c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TrueMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
+ c_bs16=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, TrueMotion=true)
+ c_bs16_nopp=QTGMC2(input, preset="slow", ThSAD2=ThSAD2, ThSCD1=ThSCD1, SourceMatch=SourceMatch, MatchPreset=MatchPreset, MatchPreset2=MatchPreset2, Lossless=Lossless, Sharpness=Sharpness, BlockSize=16, SubPel=1, Search=3, SearchParam=2, Overlap=4, ChromaMotion=true, GlobalMotion=true, TR2=TR2, mvt_SearchOption=1, mvt_AreaMode=0, mvt_mdp=6, mvt_mpm=1, SrchClipPP=0)
 
  return (Smode == 0) ? GetSharpest2_4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp) : \
- GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp)  
+  GetMedian4(c_bs8, c_bs8_nopp, c_bs16, c_bs16_nopp, input.sh_Bob(0,0.5))  
 
 }
