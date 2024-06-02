@@ -9,10 +9,15 @@ Wrapper around several QTGMC calls with different set of params (mostly differen
 Currently avaialble preset-functions of M_QTGMC:
 
 M_QTGMC_high() - highest preset. Uses 3 different modes of 2 ways in each for MAnalyse (blocksize 8x8 and 16x16, pre-processing on and off, truemotion on and off). Also uses higher AreaMode and ME params. Subsample precision of 1/4 (QPEL).
+
 M_QTGMC_medhigh() - medium high preset. Uses 2 different modes of 2 ways in each for MAnalyse (blocksize 8x8 and 16x16, pre-processing on and off). Also uses medium high AreaMode params. Subsample precision of 1/4 (QPEL).
+
 M_QTGMC() - average quality and performance preset. 
+
 M_QTGMC_medlow() - medium low preset. Subsample precision of 1/2 (HPEL).
+
 M_QTGMC_low() - low preset. Subsample precision of 1 (FPEL). No AreaMode.
+
 
 Available params:
 1. smode (integer) - sample selection mode. 0 - most different value (from low-pass filtered average). Make more sharpness but less 'linear' look, also make any noise and other sharp distortions more visible. 1 - median. Make softer look but more 'linear'.
