@@ -25,4 +25,4 @@ Available params:
 Other params:  TR2, ThSAD2, ThSCD1, SourceMatch, Lossless, Sharpness, MatchPreset, MatchPreset2 - see QTGMC documentation at http://avisynth.nl/index.php/QTGMC . MatchPreset and MatchPreset2 internally default to UltraFast and not follow preset 'slow' as in QTGMC. So it is required to manually set MatchPreset and MatchPreset2 to required value if default UltraFast is not enough.
 
 
-Known issues with mvtools 2.7.46_a.xx and 2.8.0-a.00 - too slow start time of script in comparison with pinterf build 2.7.45.
+Known issues with mvtools 2.7.46_a.xx and 2.8.0-a.00 - too slow start time of script in comparison with pinterf build 2.7.xx.
