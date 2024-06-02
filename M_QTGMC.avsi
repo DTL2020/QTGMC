@@ -54,7 +54,7 @@ Function GetMedian8(clip c1, clip c2, clip c3, clip c4, clip c5, clip c6, clip c
  avg=Average(c1, 0.125, c2, 0.125, c3, 0.125, c4, 0.125, c5, 0.125, c6, 0.125, c7, 0.125, c8, 0.125)
  int=Interleave(c1, c2, c3, c4, avg, c5, c6, c7, c8)
  med=vsTTempsmooth(int, pmode=1, maxr=4, ythresh=256, uthresh=256, vthresh=256)
- return SelectEvery(med, 8, 4)
+ return SelectEvery(med, 9, 4)
 }
 
 
