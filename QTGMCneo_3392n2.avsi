@@ -938,9 +938,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# MDegrain1 (motion compensated) rather than TemporalSmooth makes the weightings *look* different, but they evaluate to the same values
 	# Create linear weightings of neighbors first                                                                                             -2    -1     0    1     2
 #	degrain1 = (TR1 > 0) ? eval("edi.MDegrain1( ediSuper, bVec1,fVec1, thSAD=ThSAD1, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : NOP()  # 0.00  0.33  0.33  0.33  0.00
-	degrain1 = (TR1 > 0) ? edi.neo_mv_Degrain1( ediSuper, [fVec1, bVec1], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.00  0.33  0.33  0.33  0.00
+	degrain1 = (TR1 > 0) ? edi.neo_mv_Degrain1( ediSuper, [bVec1, fVec1], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.00  0.33  0.33  0.33  0.00
 #	degrain2 = (TR1 > 1) ? eval("edi.MDegrain1( ediSuper, bVec2,fVec2, thSAD=ThSAD1, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : NOP()  # 0.33  0.00  0.33  0.00  0.33
-	degrain2 = (TR1 > 1) ? edi.neo_mv_Degrain1( ediSuper, [fVec2, bVec2], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.33  0.00  0.33  0.00  0.33
+	degrain2 = (TR1 > 1) ? edi.neo_mv_Degrain1( ediSuper, [bVec2, fVec2], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.33  0.00  0.33  0.00  0.33
 	degrain1 = (TR1 > 0) ? lsb ? degrain1.ditherpost(mode=6, slice=false) : n16 ? degrain1.ConvertTo8bit(dither=1) : degrain1 : degrain1
 	degrain2 = (TR1 > 1) ? lsb ? degrain2.ditherpost(mode=6, slice=false) : n16 ? degrain2.ConvertTo8bit(dither=1) : degrain2 : degrain2
 
@@ -1008,7 +1008,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# Final light linear temporal smooth for denoising
 	stableSuper = (TR2 > 0) ? addNoise1.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us, onelevel=true) : NOP()
 	stable  = (TR2 == 0) ? addNoise1 : \
-	          (TR2 == 1) ? eval("addNoise1.neo_mv_Degrain1( stableSuper, [fVec1,bVec1],                                                                  thSAD=[ThSAD2,ThSAD2], thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
+	          (TR2 == 1) ? eval("addNoise1.neo_mv_Degrain1( stableSuper, [bVec1,fVec1],                                                                  thSAD=[ThSAD2,ThSAD2], thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
 	          (TR2 == 2) ? eval("addNoise1.MDegrain2( stableSuper, bVec1,fVec1, bVec2,fVec2,                                                     thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
  	          (TR2 == 3) ? eval("addNoise1.MDegrain3( stableSuper, bVec1,fVec1, bVec2,fVec2, bVec3,fVec3,                                        thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
  	          (TR2 == 4) ? eval("addNoise1.MDegrain4( stableSuper, bVec1,fVec1, bVec2,fVec2, bVec3,fVec3, bVec4,fVec4,                           thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
