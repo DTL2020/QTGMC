@@ -920,8 +920,8 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	# Get the max/min value for each pixel over neighboring motion-compensated frames - used for temporal sharpness limiting
 	ediSuper = (TR1 > 0 || temporalSL)   ? edi.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us, onelevel=true) : NOP()
-	bComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, bVec1, thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()
-	fComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, fVec1, thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()
+	bComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, bVec1, thSCD1=ThSCD1,thSCD2=ThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	fComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, fVec1, thSCD1=ThSCD1,thSCD2=ThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 	tMax     = (temporalSL)              ? edi.mt_logic( fComp1, "max", U=3,V=3 ).mt_logic( bComp1, "max", U=3,V=3 )    : NOP()
 	tMin     = (temporalSL)              ? edi.mt_logic( fComp1, "min", U=3,V=3 ).mt_logic( bComp1, "min", U=3,V=3 )    : NOP()
 	bComp3   = (SLRad > 1 && temporalSL) ? defined(bomt) ? edi.MCompensate( ediSuper, bVec3, thSCD1=ThSCD1,thSCD2=ThSCD2, mt=bomt              ) : edi.MCompensate( ediSuper, bVec3, thSCD1=ThSCD1,thSCD2=ThSCD2              ) : NOP()
