@@ -369,7 +369,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	Blocksize    = default( Blocksize,    Select( pNum,  bs,        bs,       bs,       bs,       bs,       bs,       bs2,      bs2,      bs2,       bs2,       bs2    ) )
 	bs = Blocksize
 	Overlap      = default( Overlap,      Select( pNum,  bs/2,      bs/2,     bs/2,     bs/2,     bs/2,     bs/2,     bs/2,     bs/4,     bs/4,      bs/4,      bs/4   ) )
-	Search       = default( Search,       Select( pNum,  5,         2,        2,        2,        2,        2,        2,        2,        0,         0,         0      ) )
+	Search       = default( Search,       Select( pNum,  3,         2,        2,        2,        2,        2,        2,        2,        0,         0,         0      ) )
 	SearchParam  = default( SearchParam,  Select( pNum,  2,         2,        2,        2,        2,        2,        2,        1,        1,         1,         1      ) )
 	SearchParam  = ESearchP && (Search==2 || Search==5) ? pNum < 4 ? 24 : pNum < 8 ? 16 : SearchParam : SearchParam
 	PelSearch    = default( PelSearch,    Select( pNum,  2,         2,        2,        2,        1,        1,        1,        1,        1,         1,         1      ) )
@@ -627,6 +627,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	NeoLambda = Int(Round(Lambda * 64.0 / (BlockSize * BlockSize)))
 	NeoThSCD2 = ThSCD2 * 100.0 / 256.0
+	Neosmooth = (RC_smooth == 0) ? false : true
 
 	srchSuper_us = IsClip(srchSuper_us) ? srchSuper_us : \
 	            (maxTR > 0) ? srchClip_us.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, rfilter=1, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us) : NOP()
@@ -693,13 +694,13 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
-	bVec2 = bVec2c || !RefineMotion || !(maxTR > 1) ? bVec2 : srchSuper_us.MRecalculate(bVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d2, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth)
+	bVec2 = bVec2c || !RefineMotion || !(maxTR > 1) ? bVec2 : srchSuper_us.neo_mv_Recalculate(bVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth)
 
-	bVec2 = bVec2c || !RefineMotion2 || !(maxTR > 1) ? bVec2 : srchSuper_us.MRecalculate(bVec2, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d4, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	bVec2 = bVec2c || !RefineMotion2 || !(maxTR > 1) ? bVec2 : srchSuper_us.neo_mv_Recalculate(bVec2, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
 
 	bVec1c = IsClip(bVec1)
@@ -708,13 +709,13 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
-	bVec1 = bVec1c || !RefineMotion || !(maxTR > 0) ? bVec1 : srchSuper_us.MRecalculate(bVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d2, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	bVec1 = bVec1c || !RefineMotion || !(maxTR > 0) ? bVec1 : srchSuper_us.neo_mv_Recalculate(bVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
-	bVec1 = bVec1c || !RefineMotion2 || !(maxTR > 0) ? bVec1 : srchSuper_us.MRecalculate(bVec1, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d4, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	bVec1 = bVec1c || !RefineMotion2 || !(maxTR > 0) ? bVec1 : srchSuper_us.neo_mv_Recalculate(bVec1, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
 
 	fVec1c = IsClip(fVec1)
@@ -723,13 +724,13 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
-	fVec1 = fVec1c || !RefineMotion || !(maxTR > 0) ? fVec1 : srchSuper_us.MRecalculate(fVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionradius, lambda=Lambda_d2, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	fVec1 = fVec1c || !RefineMotion || !(maxTR > 0) ? fVec1 : srchSuper_us.neo_mv_Recalculate(fVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionradius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
-	fVec1 = fVec1c || !RefineMotion2 || !(maxTR > 0) ? fVec1 : srchSuper_us.MRecalculate(fVec1, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d4, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	fVec1 = fVec1c || !RefineMotion2 || !(maxTR > 0) ? fVec1 : srchSuper_us.neo_mv_Recalculate(fVec1, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
 	fVec2c = IsClip(fVec2)
 	fVec2 = fVec2c ? fVec2 : \
@@ -737,13 +738,13 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
-	fVec2 = fVec2c || !RefineMotion || !(maxTR > 1) ? fVec2 : srchSuper_us.MRecalculate(fVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d2, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth )
+	fVec2 = fVec2c || !RefineMotion || !(maxTR > 1) ? fVec2 : srchSuper_us.neo_mv_Recalculate(fVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth )
 
-	fVec2 = fVec2c || !RefineMotion2 || !(maxTR > 1) ? fVec2 : srchSuper_us.MRecalculate(fVec2, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, DCT=DCT, \
-											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
-											searchparam=RefineMotionRadius, lambda=Lambda_d4, pnew=PNew, mt=(defined(bomt)) ? bomt : false, smooth=RC_smooth) 
+	fVec2 = fVec2c || !RefineMotion2 || !(maxTR > 1) ? fVec2 : srchSuper_us.neo_mv_Recalculate(fVec2, overlap=qoverlap*SubPel_us, blksize=qblksize*SubPel_us, thSAD=qthSAD, \
+											chroma=ChromaMotion, search=RefineMotionSearch, \
+											searchparam=RefineMotionRadius, mvlambda=Lambda, pnew=PNew, smooth=Neosmooth) 
 
 
 	fVec3c = IsClip(fVec3)
