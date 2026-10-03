@@ -264,7 +264,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
     RefineMotionRadius = default (RefineMotionRadius, SearchParam)
     MEus	  = default( MEus, false)
     RC_smooth	  = default( RC_smooth, 1)
-    AnalyseFields = default( AnalyseFields, true)
+    AnalyseFields = default( AnalyseFields, false)
     AnalyseTFF = default( AnalyseTFF, true)
 
 	
@@ -625,8 +625,12 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# for SubPel = 4 are we need 0.125, 0.125 or other ?
 	SubPel_us = (MEus) ? SubPel : 1
 
+	NeoSearch = 2 # pinterf search=4 (hexagon); neo search=4 is horizontal.
+	NeoLambda = Int(Round(Lambda * 64.0 / (BlockSize * BlockSize)))
+	NeoThSCD2 = ThSCD2 * 100.0 / 256.0
+
 	srchSuper_us = IsClip(srchSuper_us) ? srchSuper_us : \
-	            (maxTR > 0) ? srchClip_us.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us) : NOP()
+	            (maxTR > 0) ? srchClip_us.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, rfilter=1, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us) : NOP()
 	
 	bVec6c = IsClip(bVec6)
 	bVec6 = bVec6c ? bVec6 : \
@@ -686,9 +690,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	bVec2c = IsClip(bVec2)
 	bVec2 = bVec2c ? bVec2 : \
-	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=-2, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
-	                                            pelsearch=PelSearch, mvlambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=2, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
+	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
 	bVec2 = bVec2c || !RefineMotion || !(maxTR > 1) ? bVec2 : srchSuper_us.MRecalculate(bVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
 											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
@@ -701,9 +705,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	bVec1c = IsClip(bVec1)
 	bVec1 = bVec1c ? bVec1 : \
-	        (maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=-1, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
-	                                            pelsearch=PelSearch, mvlambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+		(maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=1, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
+	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
 	bVec1 = bVec1c || !RefineMotion || !(maxTR > 0) ? bVec1 : srchSuper_us.MRecalculate(bVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
 											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
@@ -716,9 +720,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	fVec1c = IsClip(fVec1)
 	fVec1 = fVec1c ? fVec1 : \
-	        (maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=1, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
-	                                            pelsearch=PelSearch, mvlambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	        (maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=-1, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
+	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
 	fVec1 = fVec1c || !RefineMotion || !(maxTR > 0) ? fVec1 : srchSuper_us.MRecalculate(fVec1, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
 											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
@@ -730,9 +734,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	fVec2c = IsClip(fVec2)
 	fVec2 = fVec2c ? fVec2 : \
-	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=2, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
-	                                            pelsearch=PelSearch, mvlambda=Lambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
-	                                            chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=-2, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
+	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
 	fVec2 = fVec2c || !RefineMotion || !(maxTR > 1) ? fVec2 : srchSuper_us.MRecalculate(fVec2, overlap=halfoverlap*SubPel_us, blksize=halfblksize*SubPel_us, thSAD=halfthSAD, DCT=DCT, \
 											chroma=ChromaMotion, truemotion=TrueMotion, search=RefineMotionSearch,                \
@@ -912,7 +916,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# >>>> Switch to planar YUY2 during next step - remains planar until very end of script except blurring for back blending & SVThin
 
 	# InputType=2,3: use motion mask to blend luma between original clip & reweaved clip based on ProgSADMask setting. Use chroma from original clip in any case
-	inputTypeBlend = (ProgSADMask > 0.0) ? MMask( srchClip, bVec1, kind=1, ml=ProgSADMask ) : NOP()
+	inputTypeBlend = ((InputType == 2 || InputType == 3) && ProgSADMask > 0.0) ? MMask( srchClip, bVec1, kind=1, ml=ProgSADMask ) : NOP()
 	edi = (InputType != 2 && InputType != 3) ? (!yuy2 ? edi1 : edi1.nonyuy2clipin(true)) :\
 	      (ProgSADMask <= 0.0)               ? (!yuy2 ? edi1.MergeChroma( innerClip ) : edi1.MergeChroma( innerClip ).nonyuy2clipin(true)) : \
 	                                           (!yuy2 ? mt_merge( innerClip, edi1, inputTypeBlend, U=2,V=2 ) : \
@@ -920,8 +924,8 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	# Get the max/min value for each pixel over neighboring motion-compensated frames - used for temporal sharpness limiting
 	ediSuper = (TR1 > 0 || temporalSL)   ? edi.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us, onelevel=true) : NOP()
-	bComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, bVec1, thSCD1=ThSCD1,thSCD2=ThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
-	fComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, fVec1, thSCD1=ThSCD1,thSCD2=ThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	bComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, bVec1, thSCD1=ThSCD1,thSCD2=NeoThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
+	fComp1   = (temporalSL)              ? edi.neo_mv_Compensate(ediSuper, fVec1, thSCD1=ThSCD1,thSCD2=NeoThSCD2, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 	tMax     = (temporalSL)              ? edi.mt_logic( fComp1, "max", U=3,V=3 ).mt_logic( bComp1, "max", U=3,V=3 )    : NOP()
 	tMin     = (temporalSL)              ? edi.mt_logic( fComp1, "min", U=3,V=3 ).mt_logic( bComp1, "min", U=3,V=3 )    : NOP()
 	bComp3   = (SLRad > 1 && temporalSL) ? defined(bomt) ? edi.MCompensate( ediSuper, bVec3, thSCD1=ThSCD1,thSCD2=ThSCD2, mt=bomt              ) : edi.MCompensate( ediSuper, bVec3, thSCD1=ThSCD1,thSCD2=ThSCD2              ) : NOP()
@@ -939,10 +943,8 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# alternate frames so the same binomial kernels are used. However, by using motion-compensated smoothing this time we avoid motion blur. The use of
 	# MDegrain1 (motion compensated) rather than TemporalSmooth makes the weightings *look* different, but they evaluate to the same values
 	# Create linear weightings of neighbors first                                                                                             -2    -1     0    1     2
-#	degrain1 = (TR1 > 0) ? eval("edi.MDegrain1( ediSuper, bVec1,fVec1, thSAD=ThSAD1, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : NOP()  # 0.00  0.33  0.33  0.33  0.00
-	degrain1 = (TR1 > 0) ? edi.neo_mv_Degrain1( ediSuper, [bVec1, fVec1], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.00  0.33  0.33  0.33  0.00
-#	degrain2 = (TR1 > 1) ? eval("edi.MDegrain1( ediSuper, bVec2,fVec2, thSAD=ThSAD1, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : NOP()  # 0.33  0.00  0.33  0.00  0.33
-	degrain2 = (TR1 > 1) ? edi.neo_mv_Degrain1( ediSuper, [bVec2, fVec2], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=ThSCD2) : NOP()  # 0.33  0.00  0.33  0.00  0.33
+	degrain1 = (TR1 > 0) ? edi.neo_mv_Degrain1( ediSuper, [bVec1, fVec1], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=NeoThSCD2) : NOP()  # 0.00  0.33  0.33  0.33
+	degrain2 = (TR1 > 1) ? edi.neo_mv_Degrain1( ediSuper, [bVec2, fVec2], thSAD=[ThSAD1,ThSAD1], thSCD1=ThSCD1,thSCD2=NeoThSCD2) : NOP()  # 0.33  0.00  0.33  0.00
 	degrain1 = (TR1 > 0) ? lsb ? degrain1.ditherpost(mode=6, slice=false) : n16 ? degrain1.ConvertTo8bit(dither=1) : degrain1 : degrain1
 	degrain2 = (TR1 > 1) ? lsb ? degrain2.ditherpost(mode=6, slice=false) : n16 ? degrain2.ConvertTo8bit(dither=1) : degrain2 : degrain2
 
@@ -1009,7 +1011,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# Final light linear temporal smooth for denoising
 	stableSuper = (TR2 > 0) ? addNoise1.neo_mv_Super( pel=(MEus) ? 1 : SubPel, sharp=SubPelInterp, pad=[hpad*SubPel_us, vpad*SubPel_us], blksize=BlockSize*SubPel_us, overlap=Overlap*SubPel_us, onelevel=true) : NOP()
 	stable  = (TR2 == 0) ? addNoise1 : \
-	          (TR2 == 1) ? eval("addNoise1.neo_mv_Degrain1( stableSuper, [bVec1,fVec1],                                                                  thSAD=[ThSAD2,ThSAD2], thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
+	          (TR2 == 1) ? addNoise1.neo_mv_Degrain1( stableSuper, [bVec1,fVec1], thSAD=[ThSAD2,ThSAD2], thSCD1=ThSCD1, thSCD2=NeoThSCD2) : \
 	          (TR2 == 2) ? eval("addNoise1.MDegrain2( stableSuper, bVec1,fVec1, bVec2,fVec2,                                                     thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
  	          (TR2 == 3) ? eval("addNoise1.MDegrain3( stableSuper, bVec1,fVec1, bVec2,fVec2, bVec3,fVec3,                                        thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
  	          (TR2 == 4) ? eval("addNoise1.MDegrain4( stableSuper, bVec1,fVec1, bVec2,fVec2, bVec3,fVec3, bVec4,fVec4,                           thSAD=ThSAD2, thSCD1=ThSCD1,thSCD2=ThSCD2" + sMDegnl + ")") : \
