@@ -260,7 +260,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
     TV_range      = default( TV_range,           false)
     keep_tv_range = default( keep_tv_range,      false)
     RefineMotionAll = default (RefineMotionAll, false)
-    RefineMotionSearch = default (RefineMotionSearch, Search)
+    RefineMotionSearch = default (RefineMotionSearch, Search) # do not forgot search numbers difference between neo-mv and mvtools
     RefineMotionRadius = default (RefineMotionRadius, SearchParam)
     MEus	  = default( MEus, false)
     RC_smooth	  = default( RC_smooth, 1)
@@ -369,9 +369,9 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	Blocksize    = default( Blocksize,    Select( pNum,  bs,        bs,       bs,       bs,       bs,       bs,       bs2,      bs2,      bs2,       bs2,       bs2    ) )
 	bs = Blocksize
 	Overlap      = default( Overlap,      Select( pNum,  bs/2,      bs/2,     bs/2,     bs/2,     bs/2,     bs/2,     bs/2,     bs/4,     bs/4,      bs/4,      bs/4   ) )
-	Search       = default( Search,       Select( pNum,  5,         4,        4,        4,        4,        4,        4,        4,        0,         0,         0      ) )
+	Search       = default( Search,       Select( pNum,  5,         2,        2,        2,        2,        2,        2,        2,        0,         0,         0      ) )
 	SearchParam  = default( SearchParam,  Select( pNum,  2,         2,        2,        2,        2,        2,        2,        1,        1,         1,         1      ) )
-	SearchParam  = ESearchP && (Search==4 || Search==5) ? pNum < 4 ? 24 : pNum < 8 ? 16 : SearchParam : SearchParam
+	SearchParam  = ESearchP && (Search==2 || Search==5) ? pNum < 4 ? 24 : pNum < 8 ? 16 : SearchParam : SearchParam
 	PelSearch    = default( PelSearch,    Select( pNum,  2,         2,        2,        2,        1,        1,        1,        1,        1,         1,         1      ) )
 	ChromaMotion = default( ChromaMotion, Select( pNum,  true,      true,     true,     false,    false,    false,    false,    false,    false,     false,     false  ) )
 	Precise      = default( Precise,      Select( pNum,  true,      true,     false,    false,    false,    false,    false,    false,    false,     false,     false  ) )
@@ -625,7 +625,6 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 	# for SubPel = 4 are we need 0.125, 0.125 or other ?
 	SubPel_us = (MEus) ? SubPel : 1
 
-	NeoSearch = 2 # pinterf search=4 (hexagon); neo search=4 is horizontal.
 	NeoLambda = Int(Round(Lambda * 64.0 / (BlockSize * BlockSize)))
 	NeoThSCD2 = ThSCD2 * 100.0 / 256.0
 
@@ -690,7 +689,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	bVec2c = IsClip(bVec2)
 	bVec2 = bVec2c ? bVec2 : \
-	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=2, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=2, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
@@ -705,7 +704,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	bVec1c = IsClip(bVec1)
 	bVec1 = bVec1c ? bVec1 : \
-		(maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=1, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+		(maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=1, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
@@ -720,7 +719,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	fVec1c = IsClip(fVec1)
 	fVec1 = fVec1c ? fVec1 : \
-	        (maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=-1, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	        (maxTR > 0)   ? srchSuper_us.neo_mv_Analyse(delta=-1, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
@@ -734,7 +733,7 @@ function QTGMCneo( clip Input, string "Preset", int "TR0", int "TR1", int "TR2",
 
 	fVec2c = IsClip(fVec2)
 	fVec2 = fVec2c ? fVec2 : \
-	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=-2, overlap=Overlap*SubPel_us, search=NeoSearch, searchparam=SearchParam, \
+	        (maxTR > 1)   ? srchSuper_us.neo_mv_Analyse(delta=-2, overlap=Overlap*SubPel_us, search=Search, searchparam=SearchParam, \
 	                                            pelsearch=PelSearch, mvlambda=NeoLambda, lsad=LSAD, pnew=PNew, plevel=PLevel, \
 	                                            globalmv=GlobalMotion, metric="sad", chroma=ChromaMotion, fields=AnalyseFields, tff=AnalyseTFF) : NOP()
 
